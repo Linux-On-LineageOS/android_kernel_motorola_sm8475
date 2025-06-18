@@ -22,7 +22,13 @@ jobs:
       run: |
         git -C drivers/lindroid-drm fetch -a -t
         git -C drivers/lindroid-drm checkout origin/master
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name  "GitHub Actions"
         test -n "$(git diff)" && git add drivers/lindroid-drm && git commit -m "Update lindroid-drm-loopback" || echo "No need to update"
+        ORIGIN_URL=$(git remote get-url origin);
+        git remote set-url origin "${ORIGIN_URL/https:\/\//https:\/\/${{ github.token }}@}"
+        git fetch origin $(git branch --show-current)
+        git push origin $(git branch --show-current) --force-with-lease;
     - uses: archiemeng/rebase-upstream-action@master
       with:
         branch: ${{ github.ref_name }}
